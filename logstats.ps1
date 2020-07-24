@@ -12,7 +12,11 @@ While ($timer.Enabled)
     Write-Progress -Activity "Logging container performance to $logPath" -SecondsRemaining $progress.TotalSeconds
 
     $timestamp = Get-Date -Format u
-    "$timestamp,$(docker stats --all --no-stream --format "{{.Container}},{{.Name}},{{.CPUPerc}},{{.MemUsage}},{{.NetIO}}")" >> $logPath
+    $stats = docker stats --all --no-stream --format "{{.Container}},{{.Name}},{{.CPUPerc}},{{.MemUsage}},{{.NetIO}}"
+    foreach ($stat in $stats)
+    {
+        "$timestamp,$stat" | Out-File -FilePath $logPath -Encoding utf8 -Append
+    }
 }
 
 Write-Host "Perfomance metrics has been collected"
